@@ -68,12 +68,12 @@
     <Compile Include="Utility\QuaternionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configs\App.config" />
-    <None Include="Configs\packages.config" />
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="port.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
