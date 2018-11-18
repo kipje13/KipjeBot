@@ -47,25 +47,25 @@ namespace KipjeBot.Utility
         /// <returns>The quaterion with the desired rotation.</returns>
         public static Quaternion LookAt(Vector3 forward, Vector3 up)
         {
-            /// TODO: fix this, it will always set its roll to have its up vector point in the unit Z direction
+            Vector3 left = Vector3.Cross(up, forward);
 
-            Vector3 forwardVector = Vector3.Normalize(forward);
+            Matrix4x4 m = Matrix4x4.Identity;
 
-            float dot = Vector3.Dot(Vector3.UnitX, forwardVector);
+            m.M11 = forward.X;
+            m.M12 = forward.Y;
+            m.M13 = forward.Z;
 
-            if (Math.Abs(dot - (-1.0f)) < 0.000001f)
-            {
-                return new Quaternion(up, 3.1415926535897932f);
-            }
-            if (Math.Abs(dot - (1.0f)) < 0.000001f)
-            {
-                return Quaternion.Identity;
-            }
+            m.M21 = left.X;
+            m.M22 = left.Y;
+            m.M23 = left.Z;
 
-            float rotAngle = (float)Math.Acos(dot);
-            Vector3 rotAxis = Vector3.Cross(Vector3.UnitX, forwardVector);
-            rotAxis = Vector3.Normalize(rotAxis);
-            return Quaternion.CreateFromAxisAngle(rotAxis, rotAngle);
+            m.M31 = up.X;
+            m.M32 = up.Y;
+            m.M33 = up.Z;
+
+            Quaternion q = Quaternion.CreateFromRotationMatrix(m);
+
+            return q;
         }
 
         /// <summary>

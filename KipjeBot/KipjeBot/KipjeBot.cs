@@ -56,6 +56,13 @@ namespace KipjeBot
             Car car = gameInfo.Cars[index];
             Ball ball = gameInfo.Ball;
 
+            Slice[] slices = ballPrediction.ToArray();
+
+            for (int i = 1; i < slices.Length; i++)
+            {
+                Renderer.DrawLine3D(Colors.Magenta, slices[i - 1].Position, slices[i].Position);
+            }
+
             if (playerControlled)
             {
                 aerial = null;
@@ -65,8 +72,6 @@ namespace KipjeBot
             {
                 if (aerial == null)
                 {
-                    Slice[] slices = ballPrediction.ToArray();
-
                     for (int i = 0; i < slices.Length; i++)
                     {
                         float B_avg = Aerial.CalculateCourse(car, slices[i].Position, slices[i].Time - gameInfo.Time).Length();

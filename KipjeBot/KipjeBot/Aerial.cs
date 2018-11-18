@@ -12,6 +12,8 @@ namespace KipjeBot
 {
     public class Aerial
     {
+        enum AerialState { jump, aerial };
+
         public Vector3 Target;
         public Car Car;
         public float Time;
@@ -20,35 +22,55 @@ namespace KipjeBot
 
         const float jump_t = 0.25f;
         const float jump_dx = 100.0f;
-        const float jump_dv = 600.0f;
+        const float jump_dv = 300.0f;
+
+        private AerialState state = AerialState.aerial;
 
         public Aerial(Car car, Vector3 target, float time)
         {
             Target = target;
             Car = car;
             Time = time;
+
+            if (car.HasWheelContact)
+            {
+                state = AerialState.jump;
+            }
         }
 
         public Controller Step(float dt)
         {
             Vector3 A = CalculateCourse(Car, Target, Time);
+
             Time -= dt;
 
             Controller c = new Controller();
 
             Vector3 dir = Vector3.Normalize(A);
 
-            Vector3 inputs = RotationController.GetInputs(Car, MathUtility.LookAt(dir, Car.Up), dt);
+            if (state == AerialState.jump)
+            {
+                c.Jump = true;
+                state = AerialState.aerial;
+            }
 
-            c.Roll = inputs.X;
-            c.Pitch = inputs.Y;
-            c.Yaw = inputs.Z;
+            if (state == AerialState.aerial)
+            {
+                Quaternion t = MathUtility.LookAt(dir, Car.Up);
 
-            if (MathUtility.Angle(Car.Rotation, MathUtility.LookAt(dir, Car.Up)) < 0.4f)
-                c.Boost = true;
+                Vector3 inputs = RotationController.GetInputs(Car, t, dt);
+
+                c.Roll = inputs.X;
+                c.Pitch = inputs.Y;
+                c.Yaw = inputs.Z;
+
+                if (MathUtility.Angle(Car.Rotation, MathUtility.LookAt(dir, Car.Up)) < 0.4f)
+                    c.Boost = true;
+            }
 
             if (Time < 0)
                 Finished = true;
+
 
             return c;
         }
@@ -78,7 +100,13 @@ namespace KipjeBot
 
             // estimate the time required to turn
             float phi = MathUtility.Angle(car.Rotation, MathUtility.LookAt(dir, car.Up));
-            float T = (float)(0.7 * (2.0 * Math.Sqrt(phi / a)));
+
+            if (float.IsNaN(phi))
+            {
+                phi = 0;
+            }
+
+            float T = (float)(0.7 * (2.0 * Math.Sqrt(phi / a)));           
 
             // see if the boost acceleration needed to reach the target is achievable
             return dir * 2.0f * A.Length() / ((delta_t - T) * (delta_t - T));
