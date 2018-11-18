@@ -47,6 +47,8 @@ namespace KipjeBot.Utility
         /// <returns>The quaterion with the desired rotation.</returns>
         public static Quaternion LookAt(Vector3 forward, Vector3 up)
         {
+            /// TODO: fix this, it will always set its roll to have its up vector point in the unit Z direction
+
             Vector3 forwardVector = Vector3.Normalize(forward);
 
             float dot = Vector3.Dot(Vector3.UnitX, forwardVector);
@@ -64,6 +66,22 @@ namespace KipjeBot.Utility
             Vector3 rotAxis = Vector3.Cross(Vector3.UnitX, forwardVector);
             rotAxis = Vector3.Normalize(rotAxis);
             return Quaternion.CreateFromAxisAngle(rotAxis, rotAngle);
+        }
+
+        /// <summary>
+        /// Calculates the angle between two quaternions.
+        /// </summary>
+        /// <param name="a">First quaternion.</param>
+        /// <param name="b">Second quaternion.</param>
+        /// <returns>Returns the angle in radians between two quaternions.</returns>
+        public static float Angle(Quaternion a, Quaternion b)
+        {
+            float alpha = (float)Math.Acos((b * Quaternion.Inverse(a)).W) * 2;
+
+            if (alpha > Math.PI)
+                alpha = (float)(Math.PI * 2) - alpha;
+
+            return alpha;
         }
     }
 }

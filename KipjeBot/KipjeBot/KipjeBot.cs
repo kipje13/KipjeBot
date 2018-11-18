@@ -23,6 +23,8 @@ namespace KipjeBot
         private bool playerControlled = true;
         private bool XPressed = false;
 
+        public Aerial aerial = null;
+
         public KipjeBot(string botName, int botTeam, int botIndex) : base(botName, botTeam, botIndex)
         {
             gameInfo = new GameInfo(botIndex, botTeam, botName);
@@ -56,19 +58,34 @@ namespace KipjeBot
 
             if (playerControlled)
             {
+                aerial = null;
                 controller = GamePad.GenerateControlsCustom(gamePad);
             }
             else
             {
-                Quaternion target = MathUtility.LookAt(new Vector3(car.Velocity.X, car.Velocity.Y, 0));
+                if (aerial == null)
+                {
+                    Slice[] slices = ballPrediction.ToArray();
 
-                Renderer.DrawLine3D(Colors.Red, car.Position, car.Position + Vector3.Transform(Vector3.UnitX, target) * 100);
+                    for (int i = 0; i < slices.Length; i++)
+                    {
+                        float B_avg = Aerial.CalculateCourse(car, slices[i].Position, slices[i].Time - gameInfo.Time).Length();
 
-                Vector3 inputs = RotationController.GetInputs(car, target, 0.016667f);
+                        if (B_avg > 900 && B_avg < 970)
+                        {
+                            aerial = new Aerial(car, slices[i].Position, slices[i].Time - gameInfo.Time);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    controller = aerial.Step(0.016667f);
+                    Renderer.DrawLine3D(Colors.Red, car.Position, aerial.Target);
 
-                controller.Roll = inputs.X;
-                controller.Pitch = inputs.Y;
-                controller.Yaw = inputs.Z;
+                    if (aerial.Finished)
+                        aerial = null;
+                }
             }
 
             return controller;

@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aerial.cs" />
     <Compile Include="BallPredictionCollection.cs" />
     <Compile Include="GameTickPacket\Ball.cs" />
     <Compile Include="GameTickPacket\Car.cs" />
