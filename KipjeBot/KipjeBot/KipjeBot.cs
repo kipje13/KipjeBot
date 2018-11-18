@@ -8,6 +8,7 @@ using RLBotDotNet;
 using RLBotDotNet.Renderer;
 using RLBotDotNet.GameState;
 
+using KipjeBot.GameTickPacket;
 using KipjeBot.Utility;
 
 namespace KipjeBot
@@ -15,6 +16,7 @@ namespace KipjeBot
     public class KipjeBot : Bot
     {
         private GameInfo gameInfo;
+        private FieldInfo fieldInfo;
         private BallPredictionCollection ballPrediction;
         private X.Gamepad gamePad;
 
@@ -24,8 +26,9 @@ namespace KipjeBot
         public KipjeBot(string botName, int botTeam, int botIndex) : base(botName, botTeam, botIndex)
         {
             gameInfo = new GameInfo(botIndex, botTeam, botName);
-            gameInfo.FieldInfo(GetFieldInfo());
+            fieldInfo = new FieldInfo(GetFieldInfo());
             ballPrediction = new BallPredictionCollection();
+
             gamePad = X.Gamepad_1;
         }
 
@@ -51,17 +54,17 @@ namespace KipjeBot
             Car car = gameInfo.Cars[index];
             Ball ball = gameInfo.Ball;
 
-            Vector3 target = Vector3.Zero;
-
             if (playerControlled)
             {
                 controller = GamePad.GenerateControlsCustom(gamePad);
-
-
             }
             else
             {
-                Vector3 inputs = RotationController.GetInputs(car, Quaternion.Identity, 0.016667f);
+                Quaternion target = MathUtility.LookAt(new Vector3(car.Velocity.X, car.Velocity.Y, 0));
+
+                Renderer.DrawLine3D(Colors.Red, car.Position, car.Position + Vector3.Transform(Vector3.UnitX, target) * 100);
+
+                Vector3 inputs = RotationController.GetInputs(car, target, 0.016667f);
 
                 controller.Roll = inputs.X;
                 controller.Pitch = inputs.Y;

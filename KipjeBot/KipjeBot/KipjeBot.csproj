@@ -58,6 +58,7 @@
     <Compile Include="GameTickPacket\Ball.cs" />
     <Compile Include="GameTickPacket\Car.cs" />
     <Compile Include="GameInfo.cs" />
+    <Compile Include="GameTickPacket\FieldInfo.cs" />
     <Compile Include="KipjeBot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

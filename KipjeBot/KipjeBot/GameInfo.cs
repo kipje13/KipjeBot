@@ -33,11 +33,6 @@
             this.name = name;
         }
 
-        public void FieldInfo(rlbot.flat.FieldInfo fieldInfo)
-        {
-            /// TODO
-        }
-
         /// <summary>
         /// Updates the GameInfo to reflect the new GameTickPacket.
         /// </summary>
