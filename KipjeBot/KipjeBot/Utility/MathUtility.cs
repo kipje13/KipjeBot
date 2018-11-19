@@ -76,10 +76,9 @@ namespace KipjeBot.Utility
         /// <returns>Returns the angle in radians between two quaternions.</returns>
         public static float Angle(Quaternion a, Quaternion b)
         {
-            float alpha = (float)Math.Acos((b * Quaternion.Inverse(a)).W) * 2;
+            float dot = Quaternion.Dot(a, b);
 
-            if (alpha > Math.PI)
-                alpha = (float)(Math.PI * 2) - alpha;
+            float alpha = dot > (1 - 0.000001F) ? 0.0f : (float)Math.Acos(Math.Min(Math.Abs(dot), 1.0F)) * 2.0F;
 
             return alpha;
         }

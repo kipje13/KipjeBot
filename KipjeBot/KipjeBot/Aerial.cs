@@ -22,9 +22,10 @@ namespace KipjeBot
 
         const float jump_t = 0.25f;
         const float jump_dx = 100.0f;
-        const float jump_dv = 300.0f;
+        const float jump_dv = 600.0f;
 
         private AerialState state = AerialState.aerial;
+        private int tick = 0;
 
         public Aerial(Car car, Vector3 target, float time)
         {
@@ -50,8 +51,13 @@ namespace KipjeBot
 
             if (state == AerialState.jump)
             {
-                c.Jump = true;
-                state = AerialState.aerial;
+                if (tick < 2 || tick > 3)
+                    c.Jump = true;
+
+                if (tick > 5)
+                    state = AerialState.aerial;
+
+                tick++;
             }
 
             if (state == AerialState.aerial)
@@ -70,7 +76,6 @@ namespace KipjeBot
 
             if (Time < 0)
                 Finished = true;
-
 
             return c;
         }
@@ -93,18 +98,12 @@ namespace KipjeBot
             float g = -650.0f;
             float a = 9.0f;
 
-
             Vector3 A = P - x0 - v0 * delta_t - 0.5f * g * delta_t * delta_t * z;
 
             Vector3 dir = Vector3.Normalize(A);
 
             // estimate the time required to turn
             float phi = MathUtility.Angle(car.Rotation, MathUtility.LookAt(dir, car.Up));
-
-            if (float.IsNaN(phi))
-            {
-                phi = 0;
-            }
 
             float T = (float)(0.7 * (2.0 * Math.Sqrt(phi / a)));           
 

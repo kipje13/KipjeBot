@@ -34,7 +34,7 @@ namespace KipjeBot.Utility
             if (quaternion.W > 1)
                 quaternion = Quaternion.Normalize(quaternion);
 
-            double theta = 2 * Math.Acos(quaternion.W);
+            double theta = 2 * Math.Acos(MathUtility.Clip(quaternion.W, -1, 1));
 
             
             if (theta > Math.PI)
@@ -50,6 +50,11 @@ namespace KipjeBot.Utility
                 result = new Vector3((float)(quaternion.X / s), (float)(quaternion.Y / s), (float)(quaternion.Z / s));
 
             result *= (float)theta;
+
+            if (float.IsNaN(result.X))
+            {
+                return new Vector3(quaternion.X, quaternion.Y, quaternion.Z); ;
+            }
 
             return result;
         }
