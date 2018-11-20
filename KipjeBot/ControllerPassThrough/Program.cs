@@ -1,7 +1,8 @@
-﻿using RLBotDotNet;
-using System.IO;
+﻿using System.IO;
 
-namespace KipjeBot
+using RLBotDotNet;
+
+namespace ControllerPassthrough
 {
     class Program
     {
@@ -13,7 +14,7 @@ namespace KipjeBot
             int port = int.Parse(text);
 
             // BotManager is a generic which takes in your bot as its T type.
-            BotManager<KipjeBot> botManager = new BotManager<KipjeBot>();
+            BotManager<ControllerPassthrough> botManager = new BotManager<ControllerPassthrough>();
             // Start the server on the port given in the port.cfg file.
             botManager.Start(port);
         }

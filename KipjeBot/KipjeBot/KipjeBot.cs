@@ -54,29 +54,6 @@ namespace KipjeBot
                 XPressed = false;
             }
 
-            if (timeout > 5)
-            {
-                GameState gamestate = new GameState();
-                gamestate.BallState.PhysicsState.Location = new DesiredVector3(RandomFloat(-3000, 3000), 2000, 100);
-                gamestate.BallState.PhysicsState.AngularVelocity = new DesiredVector3(0,0,0);
-                gamestate.BallState.PhysicsState.Velocity = new DesiredVector3(RandomFloat(2000, 2000), RandomFloat(1000, 2000), RandomFloat(1500, 1600));
-
-                CarState carstate = new CarState();
-                carstate.PhysicsState.AngularVelocity = new DesiredVector3(0, 0, 0);
-                carstate.PhysicsState.Velocity = new DesiredVector3(0, 0, 0);
-                carstate.PhysicsState.Location = new DesiredVector3(0, 0, 17);
-                carstate.PhysicsState.Rotation = new DesiredRotator(0, (float)(Math.PI/2), 0);
-
-                gamestate.SetCarState(index, carstate);
-
-                SetGameState(gamestate);
-
-                timeout = 0;
-                aerial = null;
-            }
-
-            timeout += gameInfo.DeltaTime;
-
             Controller controller = new Controller();
 
             Car car = gameInfo.Cars[index];
