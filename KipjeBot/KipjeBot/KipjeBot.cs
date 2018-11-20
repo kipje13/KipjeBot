@@ -101,18 +101,32 @@ namespace KipjeBot
 
                             if (B_avg > 900 && B_avg < 970)
                             {
-                                aerial = new Aerial(car, slices[i].Position, slices[i].Time - gameInfo.Time);
+                                aerial = new Aerial(car, slices[i].Position, gameInfo.Time, slices[i].Time);
                                 break;
                             }
                         }
                     }
                     else
                     {
-                        controller = aerial.Step(0.016667f);
+                        controller = aerial.Step(ball, 0.016667f, gameInfo.Time);
                         Renderer.DrawLine3D(Colors.Red, car.Position, aerial.Target);
 
                         if (aerial.Finished)
+                        {
                             aerial = null;
+                        }
+                        else
+                        {
+                            for (int i = 0; i < slices.Length; i++)
+                            {
+                                if (Math.Abs(slices[i].Time - aerial.ArrivalTime) < 0.02)
+                                {
+                                    if ((aerial.Target - slices[i].Position).Length() > 40)
+                                        aerial = null;
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }

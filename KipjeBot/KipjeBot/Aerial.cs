@@ -16,7 +16,8 @@ namespace KipjeBot
 
         public Vector3 Target;
         public Car Car;
-        public float Time;
+        public float StartTime;
+        public float ArrivalTime;
 
         public bool Finished { get; private set; } = false;
 
@@ -27,11 +28,12 @@ namespace KipjeBot
         private AerialState state = AerialState.aerial;
         private int tick = 0;
 
-        public Aerial(Car car, Vector3 target, float time)
+        public Aerial(Car car, Vector3 target, float startTime, float arrivalTime)
         {
             Target = target;
             Car = car;
-            Time = time;
+            StartTime = startTime;
+            ArrivalTime = arrivalTime;
 
             if (car.HasWheelContact)
             {
@@ -39,11 +41,9 @@ namespace KipjeBot
             }
         }
 
-        public Controller Step(float dt)
+        public Controller Step(Ball ball, float dt, float currentTime)
         {
-            Vector3 A = CalculateCourse(Car, Target, Time);
-
-            Time -= dt;
+            Vector3 A = CalculateCourse(Car, Target, ArrivalTime - currentTime);
 
             Controller c = new Controller();
 
@@ -62,7 +62,13 @@ namespace KipjeBot
 
             if (state == AerialState.aerial)
             {
-                Quaternion t = MathUtility.LookAt(dir, Car.Up);
+                Quaternion t;
+
+                if (ArrivalTime - currentTime > 0.5f)
+                    t = MathUtility.LookAt(dir, Car.Up);
+                else
+                    t = MathUtility.LookAt(Vector3.Normalize(ball.Position - Car.Position), Car.Up);
+
 
                 Vector3 inputs = RotationController.GetInputs(Car, t, dt);
 
@@ -74,7 +80,7 @@ namespace KipjeBot
                     c.Boost = true;
             }
 
-            if (Time < 0)
+            if (currentTime > ArrivalTime)
                 Finished = true;
 
             return c;
