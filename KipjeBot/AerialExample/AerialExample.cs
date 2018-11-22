@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Collections.Generic;
 using System.Windows.Media;
 
 using RLBotDotNet;
@@ -8,8 +7,8 @@ using RLBotDotNet.GameState;
 using RLBotDotNet.Renderer;
 
 using KipjeBot;
+using KipjeBot.Actions;
 using KipjeBot.GameTickPacket;
-using KipjeBot.Utility;
 
 namespace AerialExample
 {

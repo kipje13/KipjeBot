@@ -21,7 +21,7 @@ namespace ControllerPassthrough
         public override Controller GetOutput(rlbot.flat.GameTickPacket gameTickPacket)
         {
             gamePad.Update();
-            Controller controller = GamePad.GenerateControlsCustom(gamePad);
+            Controller controller = GamePad.GenerateControlsDefault(gamePad);
 
             return controller;
         }

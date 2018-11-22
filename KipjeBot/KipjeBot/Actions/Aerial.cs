@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Numerics;
 
 using RLBotDotNet;
 
 using KipjeBot.Utility;
 
-namespace KipjeBot
+namespace KipjeBot.Actions
 {
     public class Aerial
     {
-        enum AerialState { jump, aerial };
-
         public Vector3 Target;
         public Car Car;
         public float StartTime;
@@ -25,8 +20,7 @@ namespace KipjeBot
         const float jump_dx = 100.0f;
         const float jump_dv = 600.0f;
 
-        private AerialState state = AerialState.aerial;
-        private int tick = 0;
+        private DoubleJump doubleJump;
 
         public Aerial(Car car, Vector3 target, float startTime, float arrivalTime)
         {
@@ -37,7 +31,7 @@ namespace KipjeBot
 
             if (car.HasWheelContact)
             {
-                state = AerialState.jump;
+                doubleJump = new DoubleJump();
             }
         }
 
@@ -49,18 +43,11 @@ namespace KipjeBot
 
             Vector3 dir = Vector3.Normalize(A);
 
-            if (state == AerialState.jump)
+            if (doubleJump != null && !doubleJump.Finished)
             {
-                if (tick < 2 || tick > 3)
-                    c.Jump = true;
-
-                if (tick > 5)
-                    state = AerialState.aerial;
-
-                tick++;
+                c = doubleJump.Step();
             }
-
-            if (state == AerialState.aerial)
+            else
             {
                 Quaternion t;
 
@@ -80,7 +67,7 @@ namespace KipjeBot
                     c.Boost = true;
             }
 
-            if (currentTime > ArrivalTime)
+            if (currentTime > ArrivalTime || A.Length() > 1000)
                 Finished = true;
 
             return c;

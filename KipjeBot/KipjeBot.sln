@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AerialExample", "AerialExam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControllerPassthrough", "ControllerPassThrough\ControllerPassthrough.csproj", "{E1D27FA9-84CE-4EE2-B34E-13CBC5E7BDC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KickOffExample", "KickOffExample\KickOffExample.csproj", "{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{E1D27FA9-84CE-4EE2-B34E-13CBC5E7BDC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1D27FA9-84CE-4EE2-B34E-13CBC5E7BDC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1D27FA9-84CE-4EE2-B34E-13CBC5E7BDC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,5 +42,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9192455C-934B-45AF-ADEC-3E56472D5B9D} = {34FA0F92-7BF8-4A15-9F7A-DE24BCF3F159}
 		{E1D27FA9-84CE-4EE2-B34E-13CBC5E7BDC1} = {34FA0F92-7BF8-4A15-9F7A-DE24BCF3F159}
+		{EC312F99-CA36-4B1A-B7E1-AC60D56EF3EA} = {34FA0F92-7BF8-4A15-9F7A-DE24BCF3F159}
 	EndGlobalSection
 EndGlobal
