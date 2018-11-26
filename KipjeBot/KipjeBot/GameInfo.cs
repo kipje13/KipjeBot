@@ -1,4 +1,6 @@
-﻿namespace KipjeBot
+﻿using System;
+
+namespace KipjeBot
 {
     public class GameInfo
     {
@@ -21,10 +23,26 @@
         /// </summary>
         public bool IsRoundActive { get; private set; }
 
+        /// <summary>
+        /// True when the kick-off countdown reaches 0, false when the clock starts running again.
+        /// Note: True before kick-off countdown starts on the first kick-off.
+        /// </summary>
+        public bool IsKickOffPause { get; private set; }
+
         public Ball Ball { get; private set; } = new Ball();
         public Car[] Cars { get; private set; }
 
         public Car MyCar { get; private set; }
+
+        /// <summary>
+        /// Event that gets triggered once kick-off starts. (countdown reaches 0)
+        /// </summary>
+        public event EventHandler OnKickOffStarted;
+
+        protected virtual void KickOffStarted(EventArgs e)
+        {
+            OnKickOffStarted?.Invoke(this, e);
+        }
 
         public GameInfo(int index, int team, string name)
         {
@@ -45,6 +63,11 @@
                 Time = packet.GameInfo.Value.SecondsElapsed;
 
                 IsRoundActive = packet.GameInfo.Value.IsRoundActive;
+
+                if (IsKickOffPause == false && packet.GameInfo.Value.IsKickoffPause == true)
+                    KickOffStarted(new EventArgs());
+
+                IsKickOffPause = packet.GameInfo.Value.IsKickoffPause;
             }
 
             if (packet.Ball.HasValue)
