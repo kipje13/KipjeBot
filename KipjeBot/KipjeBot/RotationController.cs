@@ -48,6 +48,59 @@ namespace KipjeBot
             return u;
         }
 
+        private static Vector3 aerial_rpy(Vector3 w0, Vector3 w1, Quaternion theta, float dt) 
+        {
+            // car's moment of inertia (spherical symmetry)
+            float J = 10.5f;
+
+            // aerial control torque coefficients
+            Vector3 T = new Vector3(-400.0f, -130.0f, 95.0f);
+
+            // aerial damping torque coefficients
+            Vector3 H = new Vector3(-50.0f, -30.0f, -20.0f);
+
+            // get angular velocities in local coordinates
+            Vector3 w0_local = Vector3.Transform(w0, Quaternion.Inverse(theta));
+            Vector3 w1_local = Vector3.Transform(w1, Quaternion.Inverse(theta));
+
+            Vector3 a = T * dt / J;
+            Vector3 b = new Vector3(0, 1, 1) * (-w0_local * H * dt / J);
+            Vector3 c = w1_local - (Vector3.One + H * dt / J) * w0_local;
+
+            Vector3 rpy = new Vector3();
+
+            rpy.X = solve_PWL(a.X, b.X, c.X);
+            rpy.Y = solve_PWL(a.Y, b.Y, c.Y);
+            rpy.Z = solve_PWL(a.Z, b.Z, c.Z);
+
+            return rpy;
+        }
+
+        private static float solve_PWL(float a, float b, float c)
+        {
+            float xp = (Math.Abs(a + b) > 10e-6) ? c / (a + b) : -1.0f;
+            float xm = (Math.Abs(a - b) > 10e-6) ? c / (a - b) : 1.0f;
+
+            if ((xm <= 0) && (0 <= xp))
+            {
+                if (Math.Abs(xp) < Math.Abs(xm))
+                {
+                    return MathUtility.Clip(xp, 0.0f, 1.0f);
+                }
+                else
+                {
+                    return MathUtility.Clip(xm, -1.0f, 0.0f);
+                }
+            }
+            else
+            {
+                if (0 <= xp) return MathUtility.Clip(xp, 0.0f, 1.0f);
+                if (xm <= 0) return MathUtility.Clip(xm, -1.0f, 0.0f);
+            }
+
+            return 0;
+        }
+
         /// <summary>
         /// Returns the inputs required to rotate the car to a desired orientation.
         /// </summary>

@@ -149,5 +149,67 @@ namespace KipjeBot
             Up = Vector3.Transform(Vector3.UnitZ, Rotation);
         } 
         #endregion 
+
+        public void Simulate(Controller input, float dt)
+        {
+            if (HasWheelContact)
+            {
+                /// TODO: Driving simulation
+            }
+            else
+            {
+                SimulateAir(input, dt);
+            }
+        }
+
+        public void SimulateAir(Controller input, float dt)
+        {
+            const float M = 180.0f;  // mass
+            const float J = 10.5f;   // moment of inertia
+            const float v_max = 2300.0f;
+            const float w_max = 5.5f;
+            const float boost_force = 178500.0f;
+            const float throttle_force = 12000.0f;
+            Vector3 g = new Vector3(0.0f, 0.0f, -651.47f);
+
+            Vector3 rpy =new Vector3(input.Roll, input.Pitch, input.Yaw);
+
+            // air control torque coefficients
+            Vector3 T = new Vector3(-400.0f, -130.0f, 95.0f);
+
+            // air damping torque coefficients
+            Vector3 H = new Vector3(
+                -50.0f, -30.0f * (1.0f - Math.Abs(input.Pitch)),
+               -20.0f * (1.0f - Math.Abs(input.Yaw)));
+
+            float thrust = 0.0f;
+
+            if (input.Boost && Boost > 0)
+            {
+                thrust = (boost_force + throttle_force);
+                Boost--;
+            }
+            else
+            {
+                thrust = input.Throttle* throttle_force;
+            }
+
+            Velocity += (g + (thrust / M) * Forward) * dt;
+            Position += Velocity * dt;
+
+            Vector3 w_local = Vector3.Transform(AngularVelocity, Quaternion.Inverse(Rotation));
+
+            Vector3 old_w = AngularVelocity;
+            AngularVelocity += Vector3.Transform(T * rpy + H * w_local, Rotation) * (dt / J);
+
+            Vector3 angleAxis = 0.5f * (AngularVelocity + old_w) * dt;
+            Quaternion R = Quaternion.CreateFromAxisAngle(Vector3.Normalize(angleAxis), angleAxis.Length());
+
+            Rotation = Quaternion.Multiply(R, Rotation);
+
+            // if the velocities exceed their maximum values, scale them back
+            Velocity /= Math.Max(1.0f, Velocity.Length() / v_max);
+            AngularVelocity /= Math.Max(1.0f, AngularVelocity.Length() / w_max);
+        }
     }
 }

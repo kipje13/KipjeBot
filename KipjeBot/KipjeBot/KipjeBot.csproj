@@ -12,6 +12,8 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -61,11 +63,13 @@
     <Compile Include="Actions\Dodge.cs" />
     <Compile Include="Actions\DoubleJump.cs" />
     <Compile Include="Actions\KickOff.cs" />
+    <Compile Include="Actions\Recovery.cs" />
     <Compile Include="BallPredictionCollection.cs" />
     <Compile Include="GameTickPacket\Ball.cs" />
     <Compile Include="GameTickPacket\Car.cs" />
     <Compile Include="GameInfo.cs" />
     <Compile Include="GameTickPacket\FieldInfo.cs" />
+    <Compile Include="Physics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RotationController.cs" />
     <Compile Include="Utility\FlatConversion.cs" />

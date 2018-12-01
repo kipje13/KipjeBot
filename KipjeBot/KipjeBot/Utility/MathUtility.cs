@@ -47,7 +47,7 @@ namespace KipjeBot.Utility
         /// <returns>The quaterion with the desired rotation.</returns>
         public static Quaternion LookAt(Vector3 forward, Vector3 up)
         {
-            Vector3 left = Vector3.Cross(up, forward);
+            Vector3 left = Vector3.Normalize(Vector3.Cross(up, forward));
 
             Matrix4x4 m = Matrix4x4.Identity;
 
