@@ -3,11 +3,12 @@ using System.Numerics;
 
 using RLBotDotNet;
 
+using KipjeBot;
 using KipjeBot.Utility;
 
 namespace KipjeBot.Actions
 {
-    public class Aerial
+    public class FlipReset
     {
         public Vector3 Target;
         public Car Car;
@@ -22,7 +23,7 @@ namespace KipjeBot.Actions
 
         private DoubleJump doubleJump;
 
-        public Aerial(Car car, Vector3 target, float startTime, float arrivalTime)
+        public FlipReset(Car car, Vector3 target, float startTime, float arrivalTime)
         {
             Target = target;
             Car = car;
@@ -37,7 +38,8 @@ namespace KipjeBot.Actions
 
         public Controller Step(Ball ball, float dt, float currentTime)
         {
-            Vector3 A = CalculateCourse(Car, Target, ArrivalTime - currentTime);
+            float delta_t = ArrivalTime - currentTime;
+            Vector3 A = CalculateCourse(Car, Target, delta_t);
 
             Controller c = new Controller();
 
@@ -51,18 +53,19 @@ namespace KipjeBot.Actions
             {
                 Quaternion t;
 
-                Car test = new Car(Car);
+                Vector3 predicted = Car.Position + Car.Velocity * delta_t + 0.5f * -650f * delta_t * delta_t * Vector3.UnitZ;
 
-                for (int i = 0; i < (int)((ArrivalTime - currentTime) / 0.016667f); i++)
+                if ((predicted - Target).Length() > 50)
                 {
-                    test.Simulate(new Controller(), 0.016667f);
-                }
-
-                if ((Target - test.Position).Length() > 120)
                     t = MathUtility.LookAt(dir, Car.Up);
+                }
                 else
-                    t = MathUtility.LookAt(Vector3.Normalize(ball.Position - Car.Position), Car.Up);
+                {
+                    Vector3 d = ball.Position - Car.Position;
+                    Vector3 r = new Vector3(d.Y, -d.X, 0);
 
+                    t = MathUtility.LookAt(Vector3.Normalize(Vector3.Cross(d, r)), -Vector3.Normalize(d));
+                }
 
                 Vector3 inputs = RotationController.GetInputs(Car, t, dt);
 
@@ -72,9 +75,12 @@ namespace KipjeBot.Actions
 
                 if (MathUtility.Angle(Car.Rotation, MathUtility.LookAt(dir, Car.Up)) < 0.4f)
                     c.Boost = true;
+
+                if (Car.CanDodge)
+                    Finished = true;
             }
 
-            if (currentTime > ArrivalTime || A.Length() > 1050)
+            if (currentTime > ArrivalTime)
                 Finished = true;
 
             return c;
@@ -105,7 +111,7 @@ namespace KipjeBot.Actions
             // estimate the time required to turn
             float phi = MathUtility.Angle(car.Rotation, MathUtility.LookAt(dir, car.Up));
 
-            float T = (float)(0.7 * (2.0 * Math.Sqrt(phi / a)));           
+            float T = (float)(0.7 * (2.0 * Math.Sqrt(phi / a)));
 
             // see if the boost acceleration needed to reach the target is achievable
             return dir * 2.0f * A.Length() / ((delta_t - T) * (delta_t - T));

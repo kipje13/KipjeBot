@@ -150,6 +150,11 @@ namespace KipjeBot
         } 
         #endregion 
 
+        /// <summary>
+        /// Extrapolates the physics of this car using the given inputs.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="dt"></param>
         public void Simulate(Controller input, float dt)
         {
             if (HasWheelContact)

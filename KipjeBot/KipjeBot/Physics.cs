@@ -20,8 +20,16 @@ namespace KipjeBot
         [DllImport("Bvh.dll")]
         extern static bool IntersectSphere(Vector3 center, float radius, IntPtr normal);
 
+        /// <summary>
+        /// Loads the map geometry for the physics dll to use.
+        /// This method needs to be called before any other methods from this class can be used.
+        /// </summary>
+        /// <param name="path">The path to the geometry data.</param>
         public static void LoadMapGeometry(string path)
         {
+            if (!Environment.Is64BitProcess)
+                throw new PlatformNotSupportedException();
+
             List<float> geometry = new List<float>();
 
             using (StreamReader reader = new StreamReader(new FileStream(path, FileMode.Open)))
@@ -47,6 +55,12 @@ namespace KipjeBot
             LoadMap(ptr, geometry.Count);
         }
 
+        /// <summary>
+        /// Casts a ray against the map geometry.
+        /// </summary>
+        /// <param name="ray">The ray to be cast.</param>
+        /// <param name="result">The RayCastHit struct to populate with the result of the raycast.</param>
+        /// <returns>Returns True on a hit, False when no hit.</returns>
         public static bool RayCast(Ray ray, out RayCastHit result)
         {
             IntPtr rayptr = Marshal.AllocHGlobal(24);
@@ -73,6 +87,13 @@ namespace KipjeBot
             return hit;
         }
 
+        /// <summary>
+        /// Intersects a sphere with the map geometry.
+        /// </summary>
+        /// <param name="center">The center of the sphere.</param>
+        /// <param name="radius">The radius of the sphere.</param>
+        /// <param name="normal">A Vector3 that will contain the average normal of the intersecting triangles.</param>
+        /// <returns>Returns True on a intersect, False when no intersect.</returns>
         public static bool IntersectSphere(Vector3 center, float radius, out Vector3 normal)
         {
             IntPtr normalptr = Marshal.AllocHGlobal(12);

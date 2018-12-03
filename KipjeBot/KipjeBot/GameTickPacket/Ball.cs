@@ -61,6 +61,11 @@ namespace KipjeBot
             }
         }
 
+        /// <summary>
+        /// Extrapolates the physics of the ball.
+        /// Made by Chip: https://github.com/samuelpmish/RLUtilities/blob/master/RLUtilities/cpp/inc/ball.h
+        /// </summary>
+        /// <param name="dt">The time between the current state and the extrapolated state.</param>
         public void Simulate(float dt)
         {
             const float R = Radius;        // ball radius

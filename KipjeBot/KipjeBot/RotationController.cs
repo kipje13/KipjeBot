@@ -8,6 +8,7 @@ namespace KipjeBot
     /// <summary>
     /// A class to help rotate the car in the air.
     /// Adapted version of chip's AerialTurn class: 
+    /// https://github.com/samuelpmish/RLUtilities/blob/master/RLUtilities/cpp/src/AerialTurn.cpp
     /// </summary>
     public static class RotationController
     {

@@ -15,10 +15,10 @@ namespace KipjeBot.Actions
         {
             Controller c = new Controller();
 
-            if (tick < 2 || tick > 3)
+            if (tick < 3 || tick > 5)
                 c.Jump = true;
 
-            if (tick > 5)
+            if (tick > 7)
                 Finished = true;
 
             tick++;
