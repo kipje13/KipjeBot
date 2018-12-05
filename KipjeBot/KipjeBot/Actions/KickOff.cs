@@ -32,6 +32,9 @@ namespace KipjeBot.Actions
                 case KickOffPositions.FrontCorner:
                     return KickOffFrontCorner(dt);
 
+                case KickOffPositions.BackCorner:
+                    return KickOffBackCorner(dt);
+
                 default:
                     return new Controller();
             }
@@ -117,6 +120,49 @@ namespace KipjeBot.Actions
             controller.Throttle = 1; // No reason not to hold throttle.
 
             return controller;
+        }
+
+        private Controller KickOffBackCorner(float dt)
+        {
+            Controller c = new Controller();
+
+            if (Math.Abs(car.Position.Y) > 3200)
+            {
+                c.Boost = true;
+
+                Vector3 local = Vector3.Transform(new Vector3(0, Math.Sign(car.Position.Y) * 3000, 0) - car.Position, Quaternion.Inverse(car.Rotation));
+                c.Steer = MathUtility.Clip((float)Math.Atan2(local.Y, local.X), -1f, 1f);
+            }
+            else if (Math.Abs(car.Position.Y) > 1500)
+            {
+                Vector3 local = Vector3.Transform(new Vector3(Math.Sign(car.Position.X) * 3500, 0, 0) - car.Position, Quaternion.Inverse(car.Rotation));
+                local.Z = 0;
+                local = Vector3.Normalize(local);
+
+                if (dodge == null)
+                    dodge = new Dodge(car, 0.15f, new Vector2(-local.X, local.Y));
+
+                c = dodge.Step(dt);
+
+                c.Boost = Math.Abs(car.Position.Y) > 2600;
+            }
+            else if (Math.Abs(car.Position.Y) > 500)
+            {
+                dodge = null;
+            }
+            else
+            {
+                Vector3 local = Vector3.Transform(-car.Position, Quaternion.Inverse(car.Rotation));
+
+                if (dodge == null)
+                    dodge = new Dodge(car, 0.15f, new Vector2(-1, 0));
+
+                c = dodge.Step(dt);
+            }
+
+            c.Throttle = 1.0f; // No reason not to hold throttle.
+
+            return c;
         }
 
         public static KickOffPositions GetKickOffPosition(Vector3 location)
