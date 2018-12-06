@@ -23,6 +23,8 @@ namespace AerialExample
         private float timeout = 0;
         private Random random = new Random();
 
+        private AerialSettings settings = new AerialSettings(900, 970, 300, 2000);
+
         public AerialExample(string botName, int botTeam, int botIndex) : base(botName, botTeam, botIndex)
         {
             gameInfo = new GameInfo(botIndex, botTeam, botName);
@@ -69,16 +71,7 @@ namespace AerialExample
             {
                 if (aerial == null)
                 {
-                    for (int i = 0; i < slices.Length; i++)
-                    {
-                        float B_avg = Aerial.CalculateCourse(car, slices[i].Position, slices[i].Time - gameInfo.Time).Length();
-
-                        if (B_avg > 900 && B_avg < 970)
-                        {
-                            aerial = new Aerial(car, slices[i].Position, gameInfo.Time, slices[i].Time);
-                            break;
-                        }
-                    }
+                    aerial = Aerial.FindAerialOpportunity(car, slices, gameInfo.Time, settings);
                 }
                 else
                 {
@@ -91,15 +84,7 @@ namespace AerialExample
                     }
                     else
                     {
-                        for (int i = 0; i < slices.Length; i++)
-                        {
-                            if (Math.Abs(slices[i].Time - aerial.ArrivalTime) < 0.02)
-                            {
-                                if ((aerial.Target - slices[i].Position).Length() > 40)
-                                    aerial = null;
-                                break;
-                            }
-                        }
+                        aerial.UpdateAerialTarget(slices);
                     }
                 }
             }

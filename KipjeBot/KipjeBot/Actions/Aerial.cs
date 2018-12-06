@@ -80,6 +80,56 @@ namespace KipjeBot.Actions
             return c;
         }
 
+        /// <summary>
+        /// Updates the aerial target so the bot wont miss the ball.
+        /// </summary>
+        /// <param name="slices"></param>
+        public void UpdateAerialTarget(Slice[] slices)
+        {
+            for (int i = 0; i < slices.Length; i++)
+            {
+                if (Math.Abs(slices[i].Time - ArrivalTime) < 0.02)
+                {
+                    if ((Target - slices[i].Position).Length() > 40)
+                    {
+                        Finished = true; /// TODO: Calculate a new intercept location.
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tries to create an Aerial action from the ball prediction. Returns null when no suitable aerial is found.
+        /// </summary>
+        /// <param name="car"></param>
+        /// <param name="slices"></param>
+        /// <param name="currentTime"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public static Aerial FindAerialOpportunity(Car car, Slice[] slices, float currentTime, AerialSettings settings)
+        {
+            for (int i = 0; i < slices.Length; i++)
+            {
+                float B_avg = CalculateCourse(car, slices[i].Position, slices[i].Time - currentTime).Length();
+
+                if (B_avg > settings.MinAcceleration && B_avg < settings.MaxAcceleration)
+                {
+                    return new Aerial(car, slices[i].Position, currentTime, slices[i].Time);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Calculates the required acceleration to arrive at a location in a given amount of time.
+        /// </summary>
+        /// <param name="car">The car to use in the calculation.</param>
+        /// <param name="target">The target location for the aerial.</param>
+        /// <param name="time">The time allowed to complete the aerial.</param>
+        /// <returns></returns>
         public static Vector3 CalculateCourse(Car car, Vector3 target, float time)
         {
             Vector3 z = Vector3.UnitZ;
@@ -109,6 +159,23 @@ namespace KipjeBot.Actions
 
             // see if the boost acceleration needed to reach the target is achievable
             return dir * 2.0f * A.Length() / ((delta_t - T) * (delta_t - T));
+        }
+    }
+
+    public struct AerialSettings
+    {
+        public float MinAcceleration;
+        public float MaxAcceleration;
+
+        public float MinHeight;
+        public float MaxHeight;
+
+        public AerialSettings(float minAcceleration, float maxAcceleration, float minHeight, float maxHeight)
+        {
+            MinAcceleration = minAcceleration;
+            MaxAcceleration = maxAcceleration;
+            MinHeight = minHeight;
+            MaxHeight = maxHeight;
         }
     }
 }
