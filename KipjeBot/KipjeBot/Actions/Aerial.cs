@@ -81,10 +81,10 @@ namespace KipjeBot.Actions
         }
 
         /// <summary>
-        /// Updates the aerial target so the bot wont miss the ball.
+        /// Updates the aerial target to account for errors in the ballprediction.
         /// </summary>
         /// <param name="slices"></param>
-        public void UpdateAerialTarget(Slice[] slices)
+        public void UpdateAerialTarget(Slice[] slices, float currentTime)
         {
             for (int i = 0; i < slices.Length; i++)
             {
@@ -92,7 +92,19 @@ namespace KipjeBot.Actions
                 {
                     if ((Target - slices[i].Position).Length() > 40)
                     {
-                        Finished = true; /// TODO: Calculate a new intercept location.
+                        for (int j = 0; j < slices.Length; j++)
+                        {
+                            float B_avg = CalculateCourse(Car, slices[i].Position, slices[i].Time - currentTime).Length();
+
+                            if (B_avg > 0 && B_avg < 1050)
+                            {
+                                Target = slices[i].Position;
+                                ArrivalTime = slices[i].Time;
+                                return;
+                            }
+                        }
+
+                        Finished = true;
                     }
 
                     break;
@@ -112,11 +124,14 @@ namespace KipjeBot.Actions
         {
             for (int i = 0; i < slices.Length; i++)
             {
-                float B_avg = CalculateCourse(car, slices[i].Position, slices[i].Time - currentTime).Length();
-
-                if (B_avg > settings.MinAcceleration && B_avg < settings.MaxAcceleration)
+                if (slices[i].Position.Z > settings.MinHeight && slices[i].Position.Z < settings.MaxHeight)
                 {
-                    return new Aerial(car, slices[i].Position, currentTime, slices[i].Time);
+                    float B_avg = CalculateCourse(car, slices[i].Position, slices[i].Time - currentTime).Length();
+
+                    if (B_avg > settings.MinAcceleration && B_avg < settings.MaxAcceleration)
+                    {
+                        return new Aerial(car, slices[i].Position, currentTime, slices[i].Time);
+                    }
                 }
             }
 

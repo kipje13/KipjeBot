@@ -84,7 +84,7 @@ namespace AerialExample
                     }
                     else
                     {
-                        aerial.UpdateAerialTarget(slices);
+                        aerial.UpdateAerialTarget(slices, gameInfo.Time);
                     }
                 }
             }
